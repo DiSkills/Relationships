@@ -4,6 +4,7 @@ import pandas
 
 
 Matrix: TypeAlias = dict[int, dict[int, int]]
+Ranges: TypeAlias = list[int]
 
 
 left_border = 1
@@ -12,24 +13,24 @@ right_border = 10
 
 def is_belong(item: tuple[int, int]) -> bool:
     a, b = item
-    return a ** 2 >= 3 * b
+    return 3 * a <= 5 * b
 
 
-def is_reflexively(ranges: list[int]) -> bool:
+def is_reflexively(ranges: Ranges) -> bool:
     for a in ranges:
         if not is_belong((a, a)):
             return False
     return True
 
 
-def is_anti_reflexively(ranges: list[int]) -> bool:
+def is_anti_reflexively(ranges: Ranges) -> bool:
     for a in ranges:
         if is_belong((a, a)):
             return False
     return True
 
 
-def is_symmetrically(ranges: list[int]) -> bool:
+def is_symmetrically(ranges: Ranges) -> bool:
     for a in ranges:
         for b in ranges:
             if is_belong((a, b)) != is_belong((b, a)):
@@ -37,7 +38,7 @@ def is_symmetrically(ranges: list[int]) -> bool:
     return True
 
 
-def is_anti_symmetrically(ranges: list[int]) -> bool:
+def is_anti_symmetrically(ranges: Ranges) -> bool:
     for a in ranges:
         for b in ranges:
             if is_belong((a, b)) * is_belong((b, a)) != 0:
@@ -45,7 +46,7 @@ def is_anti_symmetrically(ranges: list[int]) -> bool:
     return True
 
 
-def is_transitively(ranges: list[int]) -> bool:
+def is_transitively(ranges: Ranges) -> bool:
     for a in ranges:
         for b in ranges:
             for c in ranges:
@@ -56,13 +57,13 @@ def is_transitively(ranges: list[int]) -> bool:
     return True
 
 
-def is_equivalence(ranges: list[int]) -> bool:
+def is_equivalence(ranges: Ranges) -> bool:
     return is_reflexively(ranges) \
             and is_symmetrically(ranges) \
             and is_transitively(ranges)
 
 
-def get_composition(r1: Matrix, r2: Matrix, ranges: list[int]) -> Matrix:
+def get_composition(r1: Matrix, r2: Matrix, ranges: Ranges) -> Matrix:
     matrix = {i: {j: 0 for j in ranges} for i in ranges}
     for a in ranges:
         for b in ranges:
@@ -72,7 +73,7 @@ def get_composition(r1: Matrix, r2: Matrix, ranges: list[int]) -> Matrix:
     return matrix
 
 
-def get_matrix(ranges: list[int]) -> Matrix:
+def get_matrix(ranges: Ranges) -> Matrix:
     matrix = {i: {j: 0 for j in ranges} for i in ranges}
     for a in ranges:
         for b in ranges:
@@ -81,7 +82,7 @@ def get_matrix(ranges: list[int]) -> Matrix:
     return matrix
 
 
-def get_short_curcuit(matrix: Matrix, ranges: list[int]) -> Matrix:
+def get_short_curcuit(matrix: Matrix, ranges: Ranges) -> Matrix:
     result = {i: {j: 0 for j in ranges} for i in ranges}
     last = matrix
     i = 1
@@ -101,10 +102,14 @@ def get_short_curcuit(matrix: Matrix, ranges: list[int]) -> Matrix:
 
     for comp, i in compositions:
         print('\nComposition:', i)
-        print(pandas.DataFrame.from_dict(comp, orient='index'))
+        print_matrix(comp)
     print()
 
     return result
+
+
+def print_matrix(matrix: Matrix) -> None:
+    print(pandas.DataFrame.from_dict(matrix, orient='index'))
 
 
 def main() -> None:
@@ -119,7 +124,7 @@ def main() -> None:
     data = get_matrix(ranges)
     short_curcuit = get_short_curcuit(data, ranges)
     print('Transitively short curcuit')
-    print(pandas.DataFrame.from_dict(short_curcuit, orient='index'))
+    print_matrix(short_curcuit)
 
 
 if __name__ == '__main__':
